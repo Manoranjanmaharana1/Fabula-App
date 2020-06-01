@@ -41,7 +41,7 @@ def recommendation(books, books_data, indices, algo, user_id, title):
     no_of_books = len(already_read)
     alpha = int((calculate_alpha(no_of_books) * 10))
     #cb = pickle.load(open('cosine_sim','rb'))
-    content_based_results = ["The Hunger Games", "The Fault in Our Stars", "Harry Potter and the Order of the Phoenix", " The Fellowship of the Ring", "Mockingjay", "A Tree Grows In Brooklyn","On the Road","The Ocean at the End of the Lane", "Clockwork Princess","The Amber Spyglass","The War of the Worlds","Life After Life","It's Kind of a Funny Story","The Virgin Suicides","Lonesome Dove","Shutter Island"]
+    content_based_results = ["The Hunger Games", "The Fault in Our Stars", "Harry Potter and the Order of the Phoenix", "The Fellowship of the Ring", "Mockingjay", "A Tree Grows In Brooklyn","On the Road","The Ocean at the End of the Lane", "Clockwork Princess","The Amber Spyglass","The War of the Worlds","Life After Life","It's Kind of a Funny Story","The Virgin Suicides","Lonesome Dove","Shutter Island"]
     content_based_results = pd.DataFrame(content_based_results)
     
     user = user.reset_index()
@@ -85,7 +85,7 @@ def main(user_id, title_of_recent_book):
 
     # importing the collaborative model
     _, algo = dump.load("surprise_cf_final.pickle")
-
+    print(user_id)
     # call for recommendation
     hybrid_recommendation = recommendation(books, books_data, indices, books_cb['corpus'], algo, user_id = user_id, title = title_of_recent_book)
     
