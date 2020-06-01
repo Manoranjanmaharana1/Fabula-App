@@ -88,7 +88,7 @@ def main(user_id, title_of_recent_book):
     print(user_id)
     print(title_of_recent_book)
     # call for recommendation
-    hybrid_recommendation = recommendation(books, books_data, indices, books_cb['corpus'], algo, user_id, title_of_recent_book)
+    hybrid_recommendation = recommendation(books, books_data, indices, algo, user_id, title_of_recent_book)
     
     # to json
     l = hybrid_recommendation.groupby(hybrid_recommendation['book_id'])
