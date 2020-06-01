@@ -61,9 +61,13 @@ def recommendation(books, books_data, indices, algo, user_id, title):
 
 def main(user_id, title_of_recent_book):
     books = pd.read_csv('books_new.csv')
+    books = books.fillna(method = 'ffill')
     ratings = pd.read_csv('ratings_new.csv')
+    ratings = ratings.fillna(method = 'ffill')
     book_tags = pd.read_csv('book_tags_new.csv', encoding = "ISO-8859-1")
+    book_tags = book_tags.fillna(method = 'ffill')
     tags = pd.read_csv('tags_new.csv')
+    tags = tags.fillna(method = 'ffill')
     books_data = pd.merge(books, ratings, on='book_id')
     tags_join_DF = pd.merge(book_tags, tags, left_on='tag_id', right_on='tag_id',   how='inner')
     #to_read = pd.read_csv('to_read.csv')
