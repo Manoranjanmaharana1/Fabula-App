@@ -25,7 +25,7 @@ def calculate_alpha(no_of_books_read):
     elif no_of_books_read>50:
         return 0.3
 
-def corpus_recommendations(books, indices, title):
+def corpus_recommendations(books, indices, title, cb):
     idx = indices[title]
     sim_scores = list(enumerate(cb[idx]))
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
@@ -40,9 +40,10 @@ def recommendation(books, books_data, indices, algo, user_id, title):
     
     no_of_books = len(already_read)
     alpha = int((calculate_alpha(no_of_books) * 10))
-    #cb = pickle.load(open('cosine_sim','rb'))
-    content_based_results = ["The Hunger Games", "The Fault in Our Stars", "Harry Potter and the Order of the Phoenix", "The Fellowship of the Ring", "Mockingjay", "A Tree Grows In Brooklyn","On the Road","The Ocean at the End of the Lane", "Clockwork Princess","The Amber Spyglass","The War of the Worlds","Life After Life","It's Kind of a Funny Story","The Virgin Suicides","Lonesome Dove","Shutter Island"]
-    content_based_results = pd.DataFrame(content_based_results)
+    cb = pickle.load(open('cosine_sim.pickle','rb'))
+    #content_based_results = ["The Hunger Games", "The Fault in Our Stars", "Harry Potter and the Order of the Phoenix", "The Fellowship of the Ring", "Mockingjay", "A Tree Grows In Brooklyn","On the Road","The Ocean at the End of the Lane", "Clockwork Princess","The Amber Spyglass","The War of the Worlds","Life After Life","It's Kind of a Funny Story","The Virgin Suicides","Lonesome Dove","Shutter Island"]
+    #content_based_results = pd.DataFrame(content_based_results)
+    content_based_results = corpus_recommendations(books, indices, title, cb)
     
     user = user.reset_index()
     user = user[~user['book_id'].isin(already_read)]
