@@ -25,31 +25,24 @@ def calculate_alpha(no_of_books_read):
     elif no_of_books_read>50:
         return 0.3
 
-def corpus_recommendations(books ,indices, title, cosine_sim_corpus):
+def corpus_recommendations(books, indices, title):
     idx = indices[title]
-    sim_scores = list(enumerate(cosine_sim_corpus[idx]))
+    sim_scores = list(enumerate(cb[idx]))
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     sim_scores = sim_scores[1:11]
     book_indices = [i[0] for i in sim_scores]
     content_based_result = books.iloc[book_indices]
     return content_based_result
 
-def content_based_training (books, books_cb, indices, title):
-    tf_corpus = TfidfVectorizer(analyzer='word',ngram_range=(1, 2),min_df=0, stop_words='english')
-    tfidf_matrix_corpus = tf_corpus.fit_transform(books_cb)
-    cosine_sim_corpus = linear_kernel(tfidf_matrix_corpus, tfidf_matrix_corpus)
-    return corpus_recommendations(books, indices, title, cosine_sim_corpus)
-
-def recommendation(books, books_data, indices, books_cb, algo, user_id, title):
+def recommendation(books, books_data, indices, algo, user_id, title):
     user = books.copy()
     already_read = books_data[books_data['user_id'] == user_id]['book_id'].unique()
     
     no_of_books = len(already_read)
     alpha = int((calculate_alpha(no_of_books) * 10))
-    #cb = pickle.load(open('cosine_sim.pickle','rb'))
-    
-    content_based_results = content_based_training(books, books_cb, indices, title).iloc[0:alpha,:]
-    
+    #cb = pickle.load(open('cosine_sim','rb'))
+    content_based_results = ["The Hunger Games", "The Fault in Our Stars", "Harry Potter and the Order of the Phoenix", " The Fellowship of the Ring", "Mockingjay", "A Tree Grows In Brooklyn","On the Road","The Ocean at the End of the Lane", "Clockwork Princess","The Amber Spyglass","The War of the Worlds","Life After Life","It's Kind of a Funny Story","The Virgin Suicides","Lonesome Dove","Shutter Island"]
+    content_based_results = pd.DataFrame(content_based_results)
     
     user = user.reset_index()
     user = user[~user['book_id'].isin(already_read)]
