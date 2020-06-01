@@ -95,12 +95,12 @@ def main(user_id, title_of_recent_book):
     hybrid_recommendation = recommendation(books, books_data, indices, algo, user_id, title_of_recent_book)
     
     # to json
-    l = hybrid_recommendation.groupby(hybrid_recommendation['book_id'])
+    #l = hybrid_recommendation.groupby(hybrid_recommendation['book_id'])
     t = dict()
     ser = pd.Series(hybrid_recommendation['book_id'])
     
     for i in ser:
-        t[i] = l.get_group(i).to_dict()
+        t[i] = ser.to_dict()
     
     var = json.dumps(t)
     
