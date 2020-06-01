@@ -41,7 +41,7 @@ def recommendation(books, books_data, indices, algo, user_id, title):
     
     no_of_books = len(already_read)
     alpha = int((calculate_alpha(no_of_books) * 10))
-    cb = pickle.load(open('cosine_sim.pickle','rb'))
+    cb = pickle.load(open('cosine_sim','rb'))
     content_based_results = corpus_recommendations(books, indices, title, cb).iloc[0:alpha,:]
      
     user = user.reset_index()
