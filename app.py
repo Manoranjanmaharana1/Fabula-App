@@ -4,6 +4,8 @@ import pandas as pd
 import pickle
 from surprise import dump
 import json
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import linear_kernel
 
 app = Flask(__name__)
 api = Api(app)
@@ -11,7 +13,6 @@ api = Api(app)
 parser = reqparse.RequestParser()
 parser.add_argument('name', type=str)
 parser.add_argument('id', type=int)
-
 
 
 def calculate_alpha(no_of_books_read):
@@ -24,26 +25,32 @@ def calculate_alpha(no_of_books_read):
     elif no_of_books_read>50:
         return 0.3
 
-
-
-def corpus_recommendations(books, indices, title, cb):
+def corpus_recommendations(books ,indices, title, cosine_sim_corpus):
     idx = indices[title]
-    sim_scores = list(enumerate(cb[idx]))
+    sim_scores = list(enumerate(cosine_sim_corpus[idx]))
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     sim_scores = sim_scores[1:11]
     book_indices = [i[0] for i in sim_scores]
     content_based_result = books.iloc[book_indices]
     return content_based_result
 
-def recommendation(books, books_data, indices, algo, user_id, title):
+def content_based_training (books, books_cb, indices, title):
+    tf_corpus = TfidfVectorizer(analyzer='word',ngram_range=(1, 2),min_df=0, stop_words='english')
+    tfidf_matrix_corpus = tf_corpus.fit_transform(books_cb)
+    cosine_sim_corpus = linear_kernel(tfidf_matrix_corpus, tfidf_matrix_corpus)
+    return corpus_recommendations(books, indices, title, cosine_sim_corpus)
+
+def recommendation(books, books_data, indices, books_cb, algo, user_id, title):
     user = books.copy()
     already_read = books_data[books_data['user_id'] == user_id]['book_id'].unique()
     
     no_of_books = len(already_read)
     alpha = int((calculate_alpha(no_of_books) * 10))
-    cb = pickle.load(open('cosine_sim.pickle','rb'))
-    content_based_results = corpus_recommendations(books, indices, title, cb).iloc[0:alpha,:]
-     
+    #cb = pickle.load(open('cosine_sim.pickle','rb'))
+    
+    content_based_results = content_based_training(books, books_cb, indices, title).iloc[0:alpha,:]
+    
+    
     user = user.reset_index()
     user = user[~user['book_id'].isin(already_read)]
     user['Estimate_Score']=user['book_id'].apply(lambda x: algo.predict(user_id, x).est)
@@ -57,6 +64,7 @@ def recommendation(books, books_data, indices, algo, user_id, title):
                                     content_based_results])
     recommended_result = recommended_result.drop('Unnamed: 0', axis=1)
     return recommended_result
+
 
 def main(user_id, title_of_recent_book):
     books = pd.read_csv('books_new.csv')
@@ -86,7 +94,7 @@ def main(user_id, title_of_recent_book):
     _, algo = dump.load("surprise_cf_final.pickle")
 
     # call for recommendation
-    hybrid_recommendation = recommendation(books, books_data, indices, algo, user_id = user_id, title = title_of_recent_book)
+    hybrid_recommendation = recommendation(books, books_data, indices, books_cb['corpus'], algo, user_id = user_id, title = title_of_recent_book)
     
     # to json
     l = hybrid_recommendation.groupby(hybrid_recommendation['book_id'])
@@ -96,12 +104,9 @@ def main(user_id, title_of_recent_book):
     for i in ser:
         t[i] = l.get_group(i).to_dict()
     
-#    file = open('recomm_books.json','w')
-    vs = json.dumps(t)
-#    file.close()
+    var = json.dumps(t)
+    
     return var
-#    return hybrid_recommendation
-
 
 
 
