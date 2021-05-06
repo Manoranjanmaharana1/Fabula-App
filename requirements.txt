@@ -4,7 +4,7 @@ numpy==1.17.3
 pandas==1.0.3
 pickleshare==0.7.5
 scikit-learn==0.22.1
-flask-cors==3.0.8
+flask-cors==3.0.9
 json5==0.9.4
 aniso8601==4.1.0
 Click==7.0
